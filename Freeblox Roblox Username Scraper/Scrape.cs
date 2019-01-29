@@ -1,4 +1,6 @@
 ﻿using HtmlAgilityPack;
+using Konsole;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -38,7 +40,7 @@ namespace Freeblox_Roblox_Username_Scraper
                 sw.AutoFlush = true;
                 for (int i = 0; i < usr.Count; i++)
                 {
-                    await sw.WriteLineAsync(usr[i].username);
+                    await sw.WriteLineAsync(usr[i].Username);
                 }
             }
         }
@@ -46,12 +48,18 @@ namespace Freeblox_Roblox_Username_Scraper
         public static void RenderUsers()
         {
             Console.Clear();
-            Console.WriteLine($"######################## Stats ########################");
-            Console.WriteLine($"## Total Users Scraped: {users.Count}                  ");
-            Console.WriteLine($"## Total Profiles Unavailable: {unavailableUsers}      ");
-            Console.WriteLine($"#######################################################");
-            Console.WriteLine($"## Press 1 To save as list");
-            Console.WriteLine($"## Press 2 To Exit");
+
+            // let's open a window with a box around it by using Window.Open
+            var credits = Window.Open(1, 4, 40, 10, "Credits");
+            credits.WriteLine("");
+            credits.WriteLine(" Made by CemsSlave - Nulled.To");
+
+            var names = Window.Open(50, 4, 40, 10, "Stats");
+            names.WriteLine("");
+            names.WriteLine($" Total Users Scraped: {Scrape.users.Count}");
+
+            Console.SetCursorPosition(0, 0);
+
             ConsoleKeyInfo key = Console.ReadKey(true);
             switch (key.Key)
             {
@@ -75,17 +83,13 @@ namespace Freeblox_Roblox_Username_Scraper
             {
                 int p = cProg;
                 cProg--;
-                string url = $"https://www.roblox.com/users/{p}/profile";
+                string url = $"https://api.roblox.com/users/{p}";
                 HtmlDocument doc = await new HtmlWeb().LoadFromWebAsync(url);
-                HtmlNode nameNode = doc.DocumentNode.SelectSingleNode("//*[@id='wrap']/div[4]/div[2]/div[2]/div/div[1]/div/div[2]/div[2]/div[1]/h2");
-                if (nameNode != null)
+                usr = JsonConvert.DeserializeObject<User>(doc.DocumentNode.InnerText);
+                if (usr != null)
                 {
-                    if (!users.Exists(x => x.username == nameNode.InnerText))
+                    if (!users.Exists(x => x.Username == usr.Username))
                     {
-                        usr = new User()
-                        {
-                            username = nameNode.InnerText,
-                        };
                         users.Add(usr);
                     }
                 }
@@ -102,7 +106,6 @@ namespace Freeblox_Roblox_Username_Scraper
             }
             finishedSignal.Signal();
             Program.UpdateTitle();
-            Program.UpdateProgress();
             return usr;
         }
 
@@ -157,7 +160,15 @@ namespace Freeblox_Roblox_Username_Scraper
         {
             #region Public Properties
 
-            public string username { get; set; }
+            public bool AvatarFinal { get; set; }
+
+            public object AvatarUri { get; set; }
+
+            public int Id { get; set; }
+
+            public bool IsOnline { get; set; }
+
+            public string Username { get; set; }
 
             #endregion Public Properties
         }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Konsole;
+using System;
 using System.Threading;
 
 namespace Freeblox_Roblox_Username_Scraper
@@ -10,6 +11,7 @@ namespace Freeblox_Roblox_Username_Scraper
         [STAThread]
         private static void Main(string[] args)
         {
+            Console.CursorVisible = false;
             DrawLogo();
             {
                 DrawOptionsMainMenu();
@@ -88,17 +90,9 @@ namespace Freeblox_Roblox_Username_Scraper
             Console.WriteLine("\nAmount of threads are scaled dynamically.", System.Drawing.Color.White);
         }
 
-        public static void UpdateProgress()
+        public static void UpdateProgress(ProgressBar pb, int progress)
         {
-            //Console.Write("Performing some task... ");
-
-            //var pb = new ProgressBar(PbStyle.DoubleLine, 50);
-            //pb.Refresh(0, "connecting to server to download 5 files asychronously.");
-            //Console.ReadLine();
-
-            //pb.Refresh(25, "downloading file number 25");
-            //Console.ReadLine();
-            //pb.Refresh(50, "finished.");
+            pb.Refresh(progress, $"Scraping.. {progress}% / {100}%");
         }
 
         public static void UpdateTitle()
